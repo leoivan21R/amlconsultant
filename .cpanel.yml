@@ -1,0 +1,1 @@
+DEPLOYPATH=/home/amlconsu/public_html/ - /bin/cp -R * $DEPLOYPAT
