@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
       hero_title_1: "Regulatory Certainty &",
       hero_title_gold: "Financial Crime Defense",
       hero_title_2: "for Modern Institutions",
-      hero_desc: "Led by Leo I. Rivera, CFE, CAMS, CAFCA. Over 24 years providing specialized BSA/AML advisory, independent 5-pillars testing, core banking & surveillance system implementation, and regulatory examination defense across Puerto Rico and the United States.",
+      hero_desc: "Led by Leo I. Rivera, CFE, CAMS, CAFCA. Over 25 years providing specialized BSA/AML advisory, independent 5-pillars testing, core banking & surveillance system implementation, and regulatory examination defense across Puerto Rico and the United States.",
       hero_btn_primary: "Request Risk Diagnostic",
       hero_btn_secondary: "Explore E-Learning Suite",
       
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
       s4_cta: "Access Training Suite →",
 
       founder_badge: "PRINCIPAL CONSULTANT",
-      founder_title: "24+ Years of Dedicated Financial Crime Prevention",
+      founder_title: "25+ Years of Dedicated Financial Crime Prevention",
       founder_p1: "Founded by Leo I. Rivera in 2020, AML Consultant LLC represents the culmination of more than two decades at the forefront of the Bank Secrecy Act and Anti-Money Laundering operations in Puerto Rico and the continental United States.",
       founder_p2: "Leo currently serves as the designated BSA Officer for multiple banking institutions. His dual mastery in regulatory law compliance and information technology infrastructure bridges the critical gap between executive board obligations and technical surveillance operations.",
       founder_systems_label: "SPECIALIZED SURVEILLANCE & AML TECH STACK",
@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
       hero_title_1: "Certeza Regulatoria y",
       hero_title_gold: "Defensa Antilavado",
       hero_title_2: "para Instituciones Modernas",
-      hero_desc: "Liderado por Leo I. Rivera, CFE, CAMS, CAFCA. Más de 24 años brindando asesoría especializada en BSA/AML, auditorías independientes de los 5 pilares, implementación de sistemas bancarios y de vigilancia, y preparación ante exámenes regulatorios en Puerto Rico y Estados Unidos.",
+      hero_desc: "Liderado por Leo I. Rivera, CFE, CAMS, CAFCA. Más de 25 años brindando asesoría especializada en BSA/AML, auditorías independientes de los 5 pilares, implementación de sistemas bancarios y de vigilancia, y preparación ante exámenes regulatorios en Puerto Rico y Estados Unidos.",
       hero_btn_primary: "Solicitar Diagnóstico de Riesgo",
       hero_btn_secondary: "Explorar Suite E-Learning",
       
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
       s4_cta: "Acceder a la Suite de Capacitación →",
 
       founder_badge: "CONSULTOR PRINCIPAL",
-      founder_title: "Más de 24 Años de Trayectoria en Prevención de Delitos Financieros",
+      founder_title: "Más de 25 Años de Trayectoria en Prevención de Delitos Financieros",
       founder_p1: "Fundada por Leo I. Rivera en el 2020, AML Consultant LLC representa la culminación de más de dos décadas de liderazgo operativo en la Ley de Secreto Bancario (BSA) y Antilavado de Dinero (AML) en Puerto Rico y Estados Unidos.",
       founder_p2: "Leo se desempeña actualmente como Oficial BSA para múltiples instituciones bancarias. Su doble dominio en cumplimiento normativo e infraestructura tecnológica conecta las obligaciones de la Junta con los sistemas de monitoreo transaccional.",
       founder_systems_label: "STACK TECNOLÓGICO Y DE MONITOREO ESPECIALIZADO",
