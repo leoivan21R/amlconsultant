@@ -127,6 +127,11 @@ document.addEventListener('DOMContentLoaded', () => {
       form_msg_placeholder: "Describe your institution's timeline, systems in use, or upcoming examination requirements...",
       form_submit_btn: "Submit Diagnostic Request",
       
+      ai_badge: "AI COMPLIANCE ASSISTANTS",
+      ai_title: "Interactive AI Compliance Assistants",
+      ai_desc: "We have programmed two specialized agents to provide immediate assistance to our users. One agent provides guidance and answers questions regarding the FFIEC manual, while the other is designed to interpret OFAC licenses and FinCEN guidelines.",
+      ai_btn: "Access AI Assistants",
+
       footer_desc: "Premier Anti-Money Laundering, Bank Secrecy Act, and financial crimes technology advisory. Providing institutional certainty and regulatory defense.",
       footer_links_title: "Navigation",
       footer_services_title: "Specialties",
@@ -251,6 +256,11 @@ document.addEventListener('DOMContentLoaded', () => {
       form_msg_placeholder: "Describa el cronograma de su institución, sistemas en uso o requisitos de su próxima auditoría...",
       form_submit_btn: "Enviar Solicitud de Diagnóstico",
       
+      ai_badge: "ASISTENTES DE IA PARA CUMPLIMIENTO",
+      ai_title: "Asistentes Interactivos de Inteligencia Artificial",
+      ai_desc: "Hemos programado dos agentes especializados para asistir a nuestros usuarios. Un agente brinda orientación sobre cualquier duda del manual FFIEC, y el otro está diseñado para interpretar licencias de OFAC y guías de FinCEN.",
+      ai_btn: "Acceder a Asistentes de IA",
+
       footer_desc: "Asesoría de primer nivel en Antilavado de Dinero (AML), Ley Secrecy Act (BSA) y tecnología para la prevención de delitos financieros.",
       footer_links_title: "Navegación",
       footer_services_title: "Especialidades",
