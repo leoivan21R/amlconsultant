@@ -14,9 +14,39 @@ document.addEventListener('DOMContentLoaded', () => {
       nav_systems: "Systems",
       nav_founder: "Leadership",
       nav_clients: "Clients",
-      nav_elearning: "E-Learning",
+      nav_elearning: "eLearning",
+      nav_toolkit: "Toolkit",
+      toolkit_badge: "COMPLIANCE & AUDIT TOOLKIT",
+      toolkit_title: "Interactive Analytical Tools for Officers & Auditors",
+      toolkit_subtitle: "Specialized diagnostic, calculation, and visual analysis instruments engineered by AML Consultant to streamline regulatory due diligence, beneficial ownership tracing, and institutional risk assessments.",
+      tool_ubo_tag: "● Ready to Use • Live Tool",
+      tool_ubo_title: "UBO & Corporate Structure Calculator",
+      tool_ubo_desc: "Visual ownership graph calculator to trace multi-tiered corporate structures, calculate cumulative beneficial ownership, identify 25%+ controlling parties, and export audit-ready PDF/Print reports.",
+      tool_ubo_feat1: "Interactive Dynamic Tree & Canvas Visualization",
+      tool_ubo_feat2: "Real-Time Multi-Tier Beneficial Ownership (%) Calculation",
+      tool_ubo_feat3: "Regulatory Audit Dossier Export & Print Preview",
+      tool_ubo_btn_open: "Open Tool in Viewer",
+      tool_btn_newtab_text: "Open in Full Window",
+      tool_disclaimer_title: "Tool Purpose & Data Privacy Notice",
+      tool_disclaimer_text: "This sheet is solely an analytical calculation and documentation tool. Under no circumstances will information entered by you be retained or maintained in permanent memory; all data operates 100% in volatile memory within your local browser during the active session.",
+      tool_risk_tag: "In Development",
+      tool_risk_title: "Institutional AML/BSA Risk Assessment Matrix",
+      tool_risk_desc: "Structured scoring methodology across Products & Services, Customer Types, Geographic Exposure, and Delivery Channels to quantify net residual institutional risk.",
+      tool_risk_feat1: "Inherent vs. Mitigated Risk Factor Scoring",
+      tool_risk_feat2: "Automated Residual Risk Matrix Heatmap",
+      tool_risk_feat3: "Board-Ready Compliance Summary Generation",
+      tool_edd_tag: "In Development",
+      tool_edd_title: "EDD & PEP Case Evaluation Workflow",
+      tool_edd_desc: "Standardized questionnaire and risk-tier checklist for Politically Exposed Persons (PEPs), cash-intensive businesses, and foreign commercial relationships.",
+      tool_edd_feat1: "Source of Wealth & Source of Funds Verification",
+      tool_edd_feat2: "Beneficial Ownership Sanctions Cross-Check",
+      tool_edd_feat3: "Auditable Periodic Review Escalation Logs",
+      tool_btn_coming_soon: "Coming Soon",
+      tool_viewer_current_title: "UBO & Corporate Structure Calculator — Live Workspace",
+      tool_btn_fullscreen: "Fullscreen",
+      tool_btn_tab: "Open Tab",
       nav_contact: "Contact",
-      btn_audit: "Schedule Audit",
+      btn_audit: "Schedule Call",
       
       hero_badge: "SECURE YOUR INSTITUTION // BSA & AML REGULATORY ADVISORY",
       hero_title_1: "Regulatory Certainty &",
@@ -143,9 +173,39 @@ document.addEventListener('DOMContentLoaded', () => {
       nav_systems: "Sistemas",
       nav_founder: "Liderazgo",
       nav_clients: "Clientes",
-      nav_elearning: "E-Learning",
+      nav_elearning: "eLearning",
+      nav_toolkit: "Herramientas",
+      toolkit_badge: "HERRAMIENTAS PARA OFICIALES Y AUDITORES",
+      toolkit_title: "Herramientas Analíticas Interactivas para Oficiales y Auditores",
+      toolkit_subtitle: "Instrumentos especializados de diagnóstico, cálculo y análisis visual diseñados por AML Consultant para optimizar la debida diligencia regulatoria, trazabilidad de beneficiarios finales y evaluación institucional de riesgos.",
+      tool_ubo_tag: "● Lista para Usar • Herramienta Activa",
+      tool_ubo_title: "Calculadora UBO y Estructura Corporativa",
+      tool_ubo_desc: "Calculadora visual de estructuras societarias multinivel para determinar beneficiarios finales acumulados, identificar partes controladoras (25%+) y exportar reportes de auditoría listos para imprimir o PDF.",
+      tool_ubo_feat1: "Visualización Dinámica Interactiva en Canvas y Árbol",
+      tool_ubo_feat2: "Cálculo en Tiempo Real de Porcentaje de Control Multinivel",
+      tool_ubo_feat3: "Exportación de Expediente de Auditoría y Vista Previa de Impresión",
+      tool_ubo_btn_open: "Abrir Herramienta en Visor",
+      tool_btn_newtab_text: "Abrir en Ventana Completa",
+      tool_disclaimer_title: "Aviso de Privacidad y Alcance de la Herramienta",
+      tool_disclaimer_text: "Esta hoja es exclusivamente una herramienta de cálculo y análisis técnico. Por ningún concepto se mantendrá en memoria permanente la información entrada por usted; todos los datos operan 100% en la memoria volátil de su navegador local durante la sesión activa.",
+      tool_risk_tag: "En Desarrollo",
+      tool_risk_title: "Matriz de Evaluación de Riesgo Institucional AML/BSA",
+      tool_risk_desc: "Metodología estructurada de calificación por Productos, Clientes, Geografía y Canales para cuantificar el riesgo residual institucional.",
+      tool_risk_feat1: "Ponderación de Riesgo Inherente vs. Mitigantes",
+      tool_risk_feat2: "Mapa de Calor Automatizado de Riesgo Residual",
+      tool_risk_feat3: "Generación de Resumen Ejecutivo para Junta Directiva",
+      tool_edd_tag: "En Desarrollo",
+      tool_edd_title: "Flujo de Evaluación de Casos PEP y Debida Diligencia Mejorada (EDD)",
+      tool_edd_desc: "Cuestionario estandarizado y matriz de verificación para Personas Expuestas Políticamente (PEPs), negocios intensivos en efectivo y operaciones transfronterizas.",
+      tool_edd_feat1: "Verificación de Origen de Riqueza y Fondos",
+      tool_edd_feat2: "Cruce de Listas Sancionatorias y Beneficiarios Finales",
+      tool_edd_feat3: "Registro de Auditoría y Escalamiento de Revisiones Periódicas",
+      tool_btn_coming_soon: "Próximamente",
+      tool_viewer_current_title: "Calculadora UBO y Estructura Corporativa — Espacio de Trabajo Activo",
+      tool_btn_fullscreen: "Pantalla Completa",
+      tool_btn_tab: "Abrir en Pestaña",
       nav_contact: "Contacto",
-      btn_audit: "Agendar Auditoría",
+      btn_audit: "Agendar Cita",
       
       hero_badge: "PROTEJA SU INSTITUCIÓN // ASESORÍA REGULATORIA BSA & AML",
       hero_title_1: "Certeza Regulatoria y",
@@ -477,7 +537,51 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Mobile menu toggle
+  
+  // Toolkit Interactive Embed Controls
+  const btnToggleTool = document.getElementById('btn-toggle-tool-embed');
+  const toolViewerWrapper = document.getElementById('tool-viewer-wrapper');
+  const btnToolFullscreen = document.getElementById('btn-tool-fullscreen');
+  const btnToolCollapse = document.getElementById('btn-tool-collapse');
+
+  if (btnToggleTool && toolViewerWrapper) {
+    btnToggleTool.addEventListener('click', () => {
+      toolViewerWrapper.classList.remove('is-collapsed');
+      toolViewerWrapper.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  if (btnToolCollapse && toolViewerWrapper) {
+    btnToolCollapse.addEventListener('click', () => {
+      toolViewerWrapper.classList.toggle('is-collapsed');
+    });
+  }
+
+  if (btnToolFullscreen && toolViewerWrapper) {
+    btnToolFullscreen.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        if (toolViewerWrapper.requestFullscreen) {
+          toolViewerWrapper.requestFullscreen();
+        } else if (toolViewerWrapper.webkitRequestFullscreen) {
+          toolViewerWrapper.webkitRequestFullscreen();
+        }
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    });
+
+    document.addEventListener('fullscreenchange', () => {
+      if (document.fullscreenElement === toolViewerWrapper) {
+        toolViewerWrapper.classList.add('in-fullscreen');
+      } else {
+        toolViewerWrapper.classList.remove('in-fullscreen');
+      }
+    });
+  }
+
+// Mobile menu toggle
   const mobileToggle = document.getElementById('mobile-toggle');
   const navLinksContainer = document.querySelector('.nav-links');
   if (mobileToggle && navLinksContainer) {

@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UBO Calculator — AML Consultant | Visualizador de Estructuras de Propiedad y Beneficiarios Finales</title>
+  <meta name="description" content="Herramienta analítica de AML Consultant (amlconsultant.com) para visualizar y calcular estructuras de propiedad corporativa multinivel y trazabilidad de beneficiarios finales.">
+  
+  <!-- Modern Typography from Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" type="image/png" href="assets/aml-icon-transparent.png">
+</head>
+<body data-theme="soft">
+
+  <!-- Top App Navigation & Quick Action Bar -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="app-brand">
+        <div class="brand-logo-container">
+          <img src="assets/aml_consultant_logo.png" alt="AML Consultant Logo" class="brand-logo-img" />
+        </div>
+        <div class="brand-text-wrap">
+          <h1 class="brand-title" data-i18n="app_title">UBO Calculator</h1>
+          <span class="brand-tagline">
+            <span data-i18n="app_subtitle">Estructuras de Propiedad •</span> <a href="https://amlconsultant.com" target="_blank" rel="noopener noreferrer" class="brand-tagline-link">amlconsultant.com</a>
+          </span>
+        </div>
+      </div>
+      <div class="disclaimer-badge">
+        <span class="disc-icon">ℹ️</span> <span data-i18n="disclaimer_badge">Cálculo y documentación • Sesión en memoria</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <!-- Language Switcher Toggle (ES / EN) -->
+      <button class="hdr-btn hdr-btn-lang" id="btn-toggle-lang" title="Switch to English / Cambiar a Español">
+        <span class="btn-icon">🌐</span> <strong id="current-lang-text">ES</strong>
+      </button>
+
+      <button class="hdr-btn" id="btn-load-demo" title="Cargar caso de prueba multinivel">
+        <span class="btn-icon">⚡</span> <span data-i18n="btn_demo_abc">Caso Ejemplo ABC</span>
+      </button>
+      <button class="hdr-btn" id="btn-load-demo-special" title="Cargar ejemplo con Entidad Especial">
+        <span class="btn-icon">🛡️</span> <span data-i18n="btn_demo_special">Caso Entidad Especial</span>
+      </button>
+      <button class="hdr-btn" id="btn-new-case" title="Reiniciar canvas y crear nuevo caso">
+        <span class="btn-icon">✨</span> <span data-i18n="btn_new_case">Nuevo Caso</span>
+      </button>
+      <button class="hdr-btn hdr-btn-primary" id="btn-print-report" title="Generar reporte imprimible y guardar PDF">
+        <span class="btn-icon">🖨️</span> <span data-i18n="btn_print_report">Imprimir / Reporte PDF</span>
+      </button>
+      <button class="hdr-btn hdr-btn-icon" id="btn-toggle-theme" title="Alternar Modo Suave / Modo Oscuro">
+        <span id="theme-icon">🌙</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main 3-Area Workspace Layout -->
+  <main class="app-main-layout">
+
+    <!-- ÁREA 1: Información del Caso & Resumen de Estado -->
+    <section class="area-case-info" aria-label="Información del Caso">
+      
+      <!-- AML Consultant Brand Badge -->
+      <div class="brand-consultant-card">
+        <div class="consultant-card-logo-wrap">
+          <img src="assets/aml-logo-transparent.png" alt="AML Consultant" class="consultant-card-logo" />
+        </div>
+        <div class="consultant-card-info">
+          <strong data-i18n="consultant_title">AML Consultant</strong>
+          <span data-i18n="consultant_desc">Consultoría en Cumplimiento ALD/CFT y Análisis Corporativo</span>
+          <a href="https://amlconsultant.com" target="_blank" rel="noopener noreferrer" class="consultant-link">amlconsultant.com ↗</a>
+        </div>
+      </div>
+
+      <div class="case-info-header">
+        <div class="section-title-wrap">
+          <span class="section-num" data-i18n="area1_tag">ÁREA 1</span>
+          <h2 class="section-title" data-i18n="area1_title">Información del Caso</h2>
+        </div>
+        <button class="btn-text-action" id="btn-edit-case-info" title="Editar">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <span data-i18n="btn_edit">Editar</span>
+        </button>
+      </div>
+
+      <div class="case-meta-cards">
+        <div class="case-meta-card">
+          <span class="case-meta-label" data-i18n="label_main_company">Compañía Principal a Analizar</span>
+          <div class="case-company-display" id="case-company-name">ABC Company</div>
+        </div>
+
+        <div class="case-meta-row">
+          <div class="case-meta-card meta-half">
+            <span class="case-meta-label" data-i18n="label_prepared_by">Preparado por</span>
+            <div class="case-meta-val" id="case-prepared-by">--</div>
+          </div>
+          <div class="case-meta-card meta-half">
+            <span class="case-meta-label" data-i18n="label_session_date">Fecha de Sesión</span>
+            <div class="case-meta-val" id="case-date">--</div>
+          </div>
+        </div>
+
+        <div class="case-meta-card">
+          <span class="case-meta-label" data-i18n="label_notes">Notas & Propósito del Análisis</span>
+          <div class="case-meta-val case-notes-val" id="case-notes">--</div>
+        </div>
+      </div>
+
+      <!-- Quick Canvas Legend -->
+      <div class="canvas-legend-card">
+        <div class="legend-card-title" data-i18n="legend_title">Leyenda Visual del Canvas</div>
+        <div class="legend-pills-grid">
+          <div class="legend-pill-item"><span class="legend-dot dot-root"></span> <span data-i18n="legend_root">Matriz (100%)</span></div>
+          <div class="legend-pill-item"><span class="legend-dot dot-business"></span> <span data-i18n="legend_business">Negocio Estándar</span></div>
+          <div class="legend-pill-item"><span class="legend-dot dot-person"></span> <span data-i18n="legend_person">Persona Natural</span></div>
+          <div class="legend-pill-item"><span class="legend-dot dot-special"></span> <span data-i18n="legend_special">Entidad Especial (Rama Detenida)</span></div>
+        </div>
+      </div>
+
+      <!-- Instructions & Privacy Notice -->
+      <div class="privacy-notice-box">
+        <div class="privacy-title" data-i18n="privacy_title">🔒 Privacidad y Sesión</div>
+        <p data-i18n="privacy_desc">Los datos ingresados existen únicamente en la memoria de su navegador. No se utiliza base de datos ni almacenamiento persistente. No se recopilan documentos KYC ni números de identificación personal (SSN/DNI).</p>
+      </div>
+    </section>
+
+    <!-- ÁREA 2: Canvas de Ownership Multinivel -->
+    <section class="area-canvas-section" aria-label="Ownership Canvas">
+      <div class="canvas-top-bar">
+        <div class="canvas-top-left">
+          <span class="section-num" data-i18n="area2_tag">ÁREA 2</span>
+          <h2 class="section-title" data-i18n="area2_title">Diagrama Interactivo de Ownership</h2>
+          <span class="canvas-hint" data-i18n="canvas_hint">Arrastre el fondo para mover • Rueda de mouse para zoom • Añada o edite directamente en los nodos</span>
+        </div>
+      </div>
+
+      <!-- Canvas Interactive Container -->
+      <div class="canvas-wrapper" id="canvas-container">
+        <!-- Injected dynamically by OwnershipCanvas -->
+      </div>
+    </section>
+
+    <!-- ÁREA 3: Resultados, Trazabilidad & Resumen de Ownership -->
+    <aside class="area-results-sidebar" aria-label="Resultados de Ownership">
+      <div class="results-header">
+        <div class="section-title-wrap">
+          <span class="section-num" data-i18n="area3_tag">ÁREA 3</span>
+          <h2 class="section-title" data-i18n="area3_title">Resultados de Participación</h2>
+        </div>
+      </div>
+
+      <!-- Real-time Level Validation Banner -->
+      <div class="validation-banner val-valid" id="validation-banner">
+        <div class="val-icon">✅</div>
+        <div class="val-text">
+          <strong data-i18n="val_title_valid">Validación de Niveles:</strong> Calculando estructura...
+        </div>
+      </div>
+
+      <!-- Ownership Distribution Breakdown & Progress Bar -->
+      <div class="results-metrics-panel">
+        <div class="panel-subtitle" data-i18n="dist_panel_title">Distribución del 100% de la Compañía</div>
+
+        <div class="metric-progress-wrapper">
+          <div class="metric-progress-bar">
+            <div class="bar-seg bar-individuals" id="prog-bar-individuals" style="width: 0%" title="Individuos"></div>
+            <div class="bar-seg bar-special" id="prog-bar-special" style="width: 0%" title="Entidades Especiales"></div>
+            <div class="bar-seg bar-pending" id="prog-bar-pending" style="width: 100%" title="Pendiente"></div>
+          </div>
+          <div class="metric-progress-legend">
+            <span><span class="dot-ind"></span> <span data-i18n="dist_legend_ind">Personas</span></span>
+            <span><span class="dot-sp"></span> <span data-i18n="dist_legend_sp">Ent. Especiales</span></span>
+            <span><span class="dot-pend"></span> <span data-i18n="dist_legend_pend">Pendiente</span></span>
+          </div>
+        </div>
+
+        <div class="metrics-grid">
+          <div class="metric-kpi-box">
+            <span class="kpi-title" data-i18n="kpi_ind_title">Individuos</span>
+            <span class="kpi-number kpi-color-ind" id="summary-individuals-pct">0.00%</span>
+            <span class="kpi-sub" data-i18n="kpi_ind_sub">Trazado a personas</span>
+          </div>
+          <div class="metric-kpi-box">
+            <span class="kpi-title" data-i18n="kpi_sp_title">Entidades Especiales</span>
+            <span class="kpi-number kpi-color-sp" id="summary-special-pct">0.00%</span>
+            <span class="kpi-sub" data-i18n="kpi_sp_sub">Ramas detenidas</span>
+          </div>
+          <div class="metric-kpi-box">
+            <span class="kpi-title" data-i18n="kpi_pend_title">Pendiente / No Asignado</span>
+            <span class="kpi-number kpi-color-pend" id="summary-pending-pct">100.00%</span>
+            <span class="kpi-sub" data-i18n="kpi_pend_sub">Sin completar</span>
+          </div>
+          <div class="metric-kpi-box">
+            <span class="kpi-title" data-i18n="kpi_tot_title">Total Explicado</span>
+            <span class="kpi-number kpi-color-tot" id="summary-total-pct">0.00%</span>
+            <span class="kpi-sub" data-i18n="kpi_tot_sub">Individuos + Especiales</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ranked Beneficial Ownership List (Individuals) -->
+      <div class="results-individuals-section">
+        <div class="results-section-header">
+          <h3 class="results-sub-title" data-i18n="results_rank_title">Personas Naturales (Ranking Efectivo)</h3>
+          <span class="results-badge-desc" data-i18n="results_rank_sub">Ordenado de mayor a menor</span>
+        </div>
+        <p class="results-clarification" data-i18n="results_rank_desc">Se muestran todos los individuos identificados sin filtros de umbral (no aplica filtro del 25%). Haga clic en cualquier persona para ver el desglose matemático de rutas.</p>
+        
+        <div class="individuals-list-container" id="individuals-list">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+
+      <!-- Special Entities Section (Stopped Branches) -->
+      <div class="results-special-section">
+        <div class="results-section-header">
+          <h3 class="results-sub-title" data-i18n="results_sp_title">Entidades Especiales (Exenciones)</h3>
+        </div>
+        <div class="special-entities-container" id="special-entities-list">
+          <!-- Injected dynamically -->
+        </div>
+      </div>
+
+      <!-- Regulatory Disclaimer Note -->
+      <div class="results-disclaimer-box">
+        <strong data-i18n="results_disclaimer_title">Nota de Cumplimiento:</strong>
+        <span data-i18n="results_disclaimer_desc">Esta aplicación es una herramienta matemática y de documentación. No debe interpretarse como asesoramiento legal ni como una determinación regulatoria concluyente sobre quién constituye un Beneficiario Final legal.</span>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- ==================== MODALS ==================== -->
+
+  <!-- Modal: Añadir Propietario -->
+  <div class="modal-overlay" id="modal-add-owner" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <h3 class="modal-title" data-i18n="modal_add_owner_title">Añadir Propietario</h3>
+          <span class="modal-subtitle"><span data-i18n="modal_parent_entity">Entidad superior:</span> <strong id="add-owner-parent-name">--</strong></span>
+        </div>
+        <button class="modal-close-btn" title="Cerrar">&times;</button>
+      </div>
+
+      <form id="form-add-owner" novalidate>
+        <input type="hidden" id="add-owner-parent-id" />
+
+        <div class="modal-body">
+          <!-- Step 1: Owner Type -->
+          <div class="form-group">
+            <label class="form-label" data-i18n="modal_owner_type_question">¿Qué tipo de propietario es?</label>
+            <div class="owner-type-selector">
+              <label class="type-card-option">
+                <input type="radio" name="owner-type" value="person" checked />
+                <div class="type-card-content">
+                  <span class="type-icon">👤</span>
+                  <div class="type-text">
+                    <strong data-i18n="modal_type_person_title">Persona Natural</strong>
+                    <small data-i18n="modal_type_person_desc">Fin de la rama • Individuo</small>
+                  </div>
+                </div>
+              </label>
+
+              <label class="type-card-option">
+                <input type="radio" name="owner-type" value="business" />
+                <div class="type-card-content">
+                  <span class="type-icon">🏢</span>
+                  <div class="type-text">
+                    <strong data-i18n="modal_type_business_title">Negocio / Entidad</strong>
+                    <small data-i18n="modal_type_business_desc">Permite desglosar o detener</small>
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Fields for Persona -->
+          <div id="fields-person-owner">
+            <!-- Link to Existing Person Option -->
+            <div id="section-link-existing-person" style="display: none;" class="link-existing-box">
+              <label class="form-label" data-i18n="modal_person_mode_label">Modalidad de Persona Natural:</label>
+              <div class="link-radio-group">
+                <label class="radio-label">
+                  <input type="radio" name="person-mode" id="radio-person-new" value="new" checked />
+                  <span data-i18n="modal_person_mode_new">Crear nueva persona natural</span>
+                </label>
+                <label class="radio-label">
+                  <input type="radio" name="person-mode" id="radio-person-link" value="link" />
+                  <span data-i18n="modal_person_mode_link">Vincular a persona existente</span>
+                </label>
+              </div>
+              <div class="form-group mt-2" id="group-select-existing-person" style="display: none;">
+                <label class="form-label" for="select-existing-person" data-i18n="modal_select_existing_placeholder">Seleccionar individuo del canvas:</label>
+                <select id="select-existing-person" class="form-control" disabled>
+                  <option value="">-- Seleccionar individuo existente --</option>
+                </select>
+                <small class="form-help" data-i18n="modal_link_help">Permite consolidar la participación si esta persona ya posee participación por otra rama.</small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="add-person-name"><span data-i18n="modal_person_name_label">Nombre del Individuo</span> <span class="req">*</span></label>
+              <input type="text" id="add-person-name" class="form-control" placeholder="Ej. Leo Rivera" autocomplete="off" />
+            </div>
+          </div>
+
+          <!-- Fields for Negocio -->
+          <div id="fields-business-owner" style="display: none;">
+            <div class="form-group">
+              <label class="form-label" for="add-business-name"><span data-i18n="modal_business_name_label">Nombre del Negocio / Entidad</span> <span class="req">*</span></label>
+              <input type="text" id="add-business-name" class="form-control" placeholder="Ej. XYZ Corporation" autocomplete="off" />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="select-business-category" data-i18n="modal_business_category_label">Categoría Regulatoria del Negocio</label>
+              <select id="select-business-category" class="form-control">
+                <option value="none" selected>Ninguna de las anteriores (Negocio estándar - Desglose permitido)</option>
+                <option value="financial_institution">Institución financiera regulada</option>
+                <option value="government_entity">Entidad gubernamental</option>
+                <option value="sec_registered">Entidad registrada ante la SEC</option>
+                <option value="cftc_nfa">Entidad registrada ante la CFTC / NFA</option>
+                <option value="pcaob_accounting">Firma de contabilidad pública registrada ante PCAOB</option>
+                <option value="pooled_vehicle">Pooled Investment Vehicle</option>
+              </select>
+              <small class="form-help" data-i18n="modal_business_cat_help">Si selecciona una categoría especial, la rama se detendrá automáticamente y no se desglosarán propietarios.</small>
+            </div>
+
+            <div class="special-category-alert" id="business-special-notice" style="display: none;">
+              <span class="alert-icon">🛡️</span>
+              <div class="alert-text">
+                <strong data-i18n="modal_special_notice_title">Rama Detenida:</strong> <span data-i18n="modal_special_notice_desc">Al pertenecer a esta categoría especial, no se solicitará información de propietarios inferiores y su porcentaje se registrará de forma diferenciada en el resumen.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Direct Percentage Input -->
+          <div class="form-group">
+            <label class="form-label" for="add-owner-percentage"><span data-i18n="modal_direct_pct_label">Porcentaje de Propiedad Directa sobre la Entidad Superior (%)</span> <span class="req">*</span></label>
+            <div class="input-with-suffix">
+              <input type="number" id="add-owner-percentage" class="form-control" step="0.0001" min="0.0001" max="100" placeholder="Ej. 50.00" />
+              <span class="input-suffix">%</span>
+            </div>
+            <div class="pct-helper" id="add-owner-pending-notice">--</div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary btn-modal-cancel" data-i18n="modal_btn_cancel">Cancelar</button>
+          <button type="submit" class="btn-primary" id="btn-save-new-owner" data-i18n="modal_btn_save_owner">Guardar Propietario</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Editar Nodo -->
+  <div class="modal-overlay" id="modal-edit-node" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" data-i18n="modal_edit_node_title">Editar Propietario / Entidad</h3>
+        <button class="modal-close-btn" title="Cerrar">&times;</button>
+      </div>
+
+      <form id="form-edit-node" novalidate>
+        <input type="hidden" id="edit-node-id" />
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="edit-node-name"><span data-i18n="modal_edit_name_label">Nombre</span> <span class="req">*</span></label>
+            <input type="text" id="edit-node-name" class="form-control" required />
+          </div>
+
+          <div class="form-group" id="edit-percentage-group">
+            <label class="form-label" for="edit-node-percentage"><span data-i18n="modal_edit_pct_label">Porcentaje Directo (%)</span> <span class="req">*</span></label>
+            <div class="input-with-suffix">
+              <input type="number" id="edit-node-percentage" class="form-control" step="0.0001" min="0.0001" max="100" required />
+              <span class="input-suffix">%</span>
+            </div>
+          </div>
+
+          <!-- Business Category Edit -->
+          <div class="form-group" id="edit-business-category-group" style="display: none;">
+            <label class="form-label" for="edit-business-category" data-i18n="modal_edit_cat_label">Categoría de Negocio</label>
+            <select id="edit-business-category" class="form-control">
+              <option value="none">Ninguna de las anteriores (Negocio estándar)</option>
+              <option value="financial_institution">Institución financiera regulada</option>
+              <option value="government_entity">Entidad gubernamental</option>
+              <option value="sec_registered">Entidad registrada ante la SEC</option>
+              <option value="cftc_nfa">Entidad registrada ante la CFTC / NFA</option>
+              <option value="pcaob_accounting">Firma de contabilidad pública registrada ante PCAOB</option>
+              <option value="pooled_vehicle">Pooled Investment Vehicle</option>
+            </select>
+          </div>
+
+          <!-- Person Linking / Unlinking -->
+          <div class="form-group" id="edit-person-linking-group" style="display: none;">
+            <label class="form-label" data-i18n="modal_edit_linking_label">Vinculación de Persona</label>
+            <div class="link-current-status">
+              <div><span data-i18n="modal_edit_internal_id">Identificador interno:</span> <code id="edit-person-current-id">--</code></div>
+              <div><span data-i18n="modal_edit_status">Estado actual:</span> <span id="edit-person-status">--</span></div>
+            </div>
+            <div class="mt-2">
+              <label class="form-label" for="edit-relink-person-select" data-i18n="modal_edit_modify_link">Modificar Vinculación:</label>
+              <select id="edit-relink-person-select" class="form-control">
+                <!-- Injected dynamically -->
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary btn-modal-cancel" data-i18n="modal_btn_cancel">Cancelar</button>
+          <button type="submit" class="btn-primary" data-i18n="modal_btn_save_changes">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Confirmar Eliminación -->
+  <div class="modal-overlay" id="modal-delete-node" role="dialog" aria-modal="true">
+    <div class="modal-dialog modal-dialog-sm">
+      <div class="modal-header">
+        <h3 class="modal-title" data-i18n="modal_delete_title">Confirmar Eliminación</h3>
+        <button class="modal-close-btn" title="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p><span data-i18n="modal_delete_prompt">¿Está seguro de que desea eliminar a</span> <strong id="delete-node-name">--</strong>?</p>
+        <div class="alert-warning-box" id="delete-descendants-notice" style="display: none;"></div>
+        <p class="mt-2 text-muted" data-i18n="modal_delete_recalc_notice">Toda la estructura y cálculos de participación efectiva se recalcularán automáticamente en tiempo real.</p>
+        <input type="hidden" id="delete-node-id" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary btn-modal-cancel" data-i18n="modal_btn_cancel">Cancelar</button>
+        <button type="button" class="btn-danger" id="btn-confirm-delete" data-i18n="modal_btn_delete">Eliminar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Información del Caso -->
+  <div class="modal-overlay" id="modal-case-info" role="dialog" aria-modal="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" data-i18n="modal_case_info_title">Editar Información del Caso</h3>
+        <button class="modal-close-btn" title="Cerrar">&times;</button>
+      </div>
+      <form id="form-case-info" novalidate>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label" for="case-info-company"><span data-i18n="modal_company_name_label">Nombre de la Compañía Principal</span> <span class="req">*</span></label>
+            <input type="text" id="case-info-company" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="case-info-prepared" data-i18n="modal_prepared_by_label">Preparado por (Opcional)</label>
+            <input type="text" id="case-info-prepared" class="form-control" placeholder="Ej. Auditor de Cumplimiento / Institución Financiera" data-i18n-placeholder="modal_prepared_by_placeholder" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="case-info-notes" data-i18n="modal_notes_label">Notas / Observaciones del Análisis (Opcional)</label>
+            <textarea id="case-info-notes" class="form-control" rows="3" placeholder="Detalles de la sesión, referencias de documentos analizados, etc." data-i18n-placeholder="modal_notes_placeholder"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary btn-modal-cancel" data-i18n="modal_btn_cancel">Cancelar</button>
+          <button type="submit" class="btn-primary" data-i18n="modal_btn_save_case">Guardar Información</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Imprimir y Reporte PDF Profesional (Step 17) -->
+  <div class="modal-overlay modal-fullscreen-overlay" id="modal-print-report" role="dialog" aria-modal="true">
+    <div class="modal-fullscreen-container">
+      <div class="print-preview-bar">
+        <div class="print-preview-title">
+          <span data-i18n="print_preview_bar_title">Vista Previa del Reporte de Ownership para Impresión / PDF • AML Consultant</span>
+        </div>
+        <div class="print-preview-actions">
+          <button class="hdr-btn hdr-btn-lang" id="btn-toggle-lang-preview" title="Switch to English / Cambiar a Español">
+            <span class="btn-icon">🌐</span> <strong id="current-lang-preview-text">ES</strong>
+          </button>
+          <button class="hdr-btn hdr-btn-primary" id="btn-execute-print">
+            <span data-i18n="print_btn_execute">🖨️ Enviar a Imprimir / Guardar como PDF</span>
+          </button>
+          <button class="btn-secondary btn-modal-cancel" data-i18n="print_btn_close">Cerrar Vista Previa</button>
+        </div>
+      </div>
+
+      <div class="print-preview-scroll-area">
+        <div id="print-report-content">
+          <!-- Injected dynamically by renderPrintContent() in selected language -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Logic Modules -->
+  <script type="module" src="js/i18n.js"></script>
+  <script type="module" src="js/engine.js"></script>
+  <script type="module" src="js/canvas.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

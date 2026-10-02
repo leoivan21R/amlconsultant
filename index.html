@@ -48,7 +48,8 @@
         <a href="#systems" class="nav-link" data-i18n="nav_systems">Systems</a>
         <a href="#founder" class="nav-link" data-i18n="nav_founder">Leadership</a>
         <a href="#clients" class="nav-link" data-i18n="nav_clients">Clients</a>
-        <a href="#elearning" class="nav-link" data-i18n="nav_elearning">E-Learning</a>
+        <a href="#elearning" class="nav-link" data-i18n="nav_elearning">eLearning</a>
+        <a href="#toolkit" class="nav-link" data-i18n="nav_toolkit">Toolkit</a>
         <a href="#contact" class="nav-link" data-i18n="nav_contact">Contact</a>
       </nav>
 
@@ -630,6 +631,120 @@
   </section>
 
   <!-- ========================================================================
+       Compliance & Audit Toolkit Section
+       ======================================================================== -->
+  <section class="section toolkit-section" id="toolkit">
+    <div class="container">
+      <div class="section-header">
+        <div class="badge-tag gold" data-i18n="toolkit_badge">COMPLIANCE &amp; AUDIT TOOLKIT</div>
+        <h2 class="section-title" data-i18n="toolkit_title">Interactive Analytical Tools for Officers &amp; Auditors</h2>
+        <p class="section-subtitle" data-i18n="toolkit_subtitle">
+          Specialized diagnostic, calculation, and visual analysis instruments engineered by AML Consultant to streamline regulatory due diligence, beneficial ownership tracing, and institutional risk assessments.
+        </p>
+      </div>
+
+      <!-- Featured Active Tool Showcase -->
+      <div class="toolkit-showcase-container">
+        <!-- Active Tool: UBO Calculator -->
+        <div class="elearn-card tool-card active-tool-card tool-card-featured" id="card-tool-ubo">
+          <div class="tool-featured-content">
+            <div class="tool-card-header">
+              <div class="tool-status-pills">
+                <span class="badge-tag blue tool-tag-active" data-i18n="tool_ubo_tag">● Ready to Use • Live Tool</span>
+                <span class="tool-version-badge">v1.0 • Client-Side Engine</span>
+              </div>
+            </div>
+            <h3 class="elearn-title tool-featured-title" data-i18n="tool_ubo_title">UBO &amp; Corporate Structure Calculator</h3>
+            <p class="elearn-desc tool-featured-desc" data-i18n="tool_ubo_desc">
+              Visual ownership graph calculator to trace multi-tiered corporate structures, calculate cumulative beneficial ownership, identify 25%+ controlling parties, and export audit-ready PDF/Print reports.
+            </p>
+
+            <ul class="elearn-features tool-featured-features">
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span data-i18n="tool_ubo_feat1">Interactive Dynamic Tree &amp; Canvas Visualization</span>
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span data-i18n="tool_ubo_feat2">Real-Time Multi-Tier Beneficial Ownership (%) Calculation</span>
+              </li>
+              <li>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                <span data-i18n="tool_ubo_feat3">Regulatory Audit Dossier Export &amp; Print Preview</span>
+              </li>
+            </ul>
+
+            <!-- Disclaimer Box -->
+            <div class="tool-disclaimer-box">
+              <div class="tool-disclaimer-header">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                </svg>
+                <strong data-i18n="tool_disclaimer_title">Tool Purpose &amp; Data Privacy Notice</strong>
+              </div>
+              <p class="tool-disclaimer-text" data-i18n="tool_disclaimer_text">
+                This sheet is solely an analytical calculation and documentation tool. Under no circumstances will information entered by you be retained or maintained in permanent memory; all data operates 100% in volatile memory within your local browser during the active session.
+              </p>
+            </div>
+          </div>
+
+          <div class="tool-card-actions tool-featured-actions">
+            <a href="tools/ubo/index.html" target="_blank" rel="noopener noreferrer" class="btn btn-primary tool-btn-external" data-i18n-title="tool_ubo_btn_newtab" title="Open in New Full Window">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+              <span data-i18n="tool_btn_newtab_text">Open in Full Window</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Embedded Tool Viewer Workspace -->
+      <div class="tool-viewer-wrapper" id="tool-viewer-wrapper">
+        <div class="tool-viewer-bar">
+          <div class="tool-viewer-title-group">
+            <span class="tool-viewer-live-dot"></span>
+            <strong class="tool-viewer-title" data-i18n="tool_viewer_current_title">UBO &amp; Corporate Structure Calculator — Live Workspace</strong>
+            <span class="tool-viewer-path">tools/ubo/</span>
+          </div>
+          <div class="tool-viewer-controls">
+            <button type="button" class="btn-viewer-ctrl" id="btn-tool-fullscreen" title="Toggle Fullscreen">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+              </svg>
+              <span data-i18n="tool_btn_fullscreen">Fullscreen</span>
+            </button>
+            <a href="tools/ubo/index.html" target="_blank" rel="noopener noreferrer" class="btn-viewer-ctrl" title="Open in separate window">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+              <span data-i18n="tool_btn_tab">Open Tab</span>
+            </a>
+            <button type="button" class="btn-viewer-ctrl btn-viewer-collapse" id="btn-tool-collapse" title="Collapse / Expand Viewer">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="18 15 12 9 6 15"></polyline>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="tool-iframe-container">
+          <iframe 
+            id="ubo-tool-iframe"
+            src="tools/ubo/index.html" 
+            title="AML Consultant UBO &amp; Corporate Structure Calculator"
+            loading="lazy"
+            allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================================
        AI Compliance Assistants Section
        ======================================================================== -->
   <section class="section ai-assistants-section" id="ai-assistants">
@@ -825,7 +940,8 @@
             <li><a href="#systems" data-i18n="nav_systems">Systems</a></li>
             <li><a href="#founder" data-i18n="nav_founder">Leadership</a></li>
             <li><a href="#clients" data-i18n="nav_clients">Clients</a></li>
-            <li><a href="#elearning" data-i18n="nav_elearning">E-Learning</a></li>
+            <li><a href="#elearning" data-i18n="nav_elearning">eLearning</a></li>
+            <li><a href="#toolkit" data-i18n="nav_toolkit">Toolkit</a></li>
           </ul>
         </div>
 
