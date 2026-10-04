@@ -471,6 +471,72 @@
     </div>
   </div>
 
+  <!-- Modal: Opciones de Formato de Impresión / PDF -->
+  <div class="modal-overlay" id="modal-print-options" role="dialog" aria-modal="true">
+    <div class="modal-dialog modal-dialog-md">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <span>🖨️</span> <span data-i18n="print_options_title">Configuración de Reporte PDF e Impresión</span>
+        </h3>
+        <button class="modal-close-btn" title="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="print-options-subtitle" data-i18n="print_options_subtitle">
+          Seleccione la orientación deseada para el Diagrama de Estructura de Propiedad (Página 1):
+        </p>
+
+        <div class="print-orientation-cards">
+          <!-- Opción 1: Horizontal (Landscape) -->
+          <label class="orientation-card active-card" id="opt-card-landscape">
+            <input type="radio" name="print-diagram-orientation" value="landscape" checked />
+            <div class="orientation-card-content">
+              <div class="orientation-icon-box">🖼️</div>
+              <div class="orientation-card-text">
+                <div class="orientation-card-title">
+                  <span data-i18n="print_opt_landscape_title">Horizontal (Landscape)</span>
+                  <span class="badge-recommended" data-i18n="badge_recommended">Recomendado</span>
+                </div>
+                <div class="orientation-card-desc" data-i18n="print_opt_landscape_desc">
+                  Aprovecha todo el ancho de la hoja para que los nombres, porcentajes y ramas del diagrama se vean en gran tamaño y máxima nitidez.
+                </div>
+              </div>
+            </div>
+          </label>
+
+          <!-- Opción 2: Vertical (Portrait) -->
+          <label class="orientation-card" id="opt-card-portrait">
+            <input type="radio" name="print-diagram-orientation" value="portrait" />
+            <div class="orientation-card-content">
+              <div class="orientation-icon-box">📄</div>
+              <div class="orientation-card-text">
+                <div class="orientation-card-title" data-i18n="print_opt_portrait_title">
+                  Vertical (Portrait)
+                </div>
+                <div class="orientation-card-desc" data-i18n="print_opt_portrait_desc">
+                  Diagrama en orientación vertical tradicional (recomendado para diagramas con pocas ramas o estrechos).
+                </div>
+              </div>
+            </div>
+          </label>
+        </div>
+
+        <div class="print-options-note">
+          <span class="note-icon">📌</span>
+          <div>
+            <strong data-i18n="print_options_note_bold">Página 2 fija en Vertical (Portrait):</strong>
+            <span data-i18n="print_options_note_desc">La tabla consolidada de Beneficiarios Finales, trazabilidad de rutas y entidades especiales siempre se generará en formato vertical para una lectura óptima.</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary btn-modal-cancel" data-i18n="modal_btn_cancel">Cancelar</button>
+        <button type="button" class="btn-primary" id="btn-confirm-print-options">
+          <span data-i18n="print_btn_continue_preview">Continuar a Vista Previa ➡️</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal: Imprimir y Reporte PDF Profesional (Step 17) -->
   <div class="modal-overlay modal-fullscreen-overlay" id="modal-print-report" role="dialog" aria-modal="true">
     <div class="modal-fullscreen-container">
@@ -482,6 +548,13 @@
           <button class="hdr-btn hdr-btn-lang" id="btn-toggle-lang-preview" title="Switch to English / Cambiar a Español">
             <span class="btn-icon">🌐</span> <strong id="current-lang-preview-text">ES</strong>
           </button>
+          <div class="print-toolbar-orientation-group">
+            <span class="toolbar-label" data-i18n="print_toolbar_diagram_label">Diagrama (Pág. 1):</span>
+            <button class="hdr-btn btn-diagram-orient" id="btn-toggle-print-orientation" title="Alternar orientación del diagrama (Página 1)">
+              <span id="current-orientation-text" data-i18n="print_btn_orientation_landscape">🖼️ Horizontal (Landscape)</span>
+            </button>
+            <span class="badge-fixed-portrait" title="La página 2 siempre se mantiene en formato vertical" data-i18n="print_p2_fixed_badge">🔒 Pág. 2 (Dueños): Vertical</span>
+          </div>
           <button class="hdr-btn hdr-btn-primary" id="btn-execute-print">
             <span data-i18n="print_btn_execute">🖨️ Enviar a Imprimir / Guardar como PDF</span>
           </button>

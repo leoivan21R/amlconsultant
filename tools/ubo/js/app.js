@@ -28,6 +28,7 @@ class UBOApp {
     this.expandedPersons = new Set();
     this.currentTheme = 'soft'; // 'soft' (default) or 'dark'
     this.currentLang = getLanguage(); // 'es' or 'en'
+    this.printOrientation = 'portrait'; // 'portrait' or 'landscape'
 
     this.init();
   }
@@ -86,7 +87,31 @@ class UBOApp {
     });
 
     document.getElementById('btn-print-report')?.addEventListener('click', () => {
-      this.openPrintReportModal();
+      this.openPrintOptionsModal();
+    });
+
+    document.querySelectorAll('.orientation-card').forEach(card => {
+      card.addEventListener('click', () => {
+        document.querySelectorAll('.orientation-card').forEach(c => c.classList.remove('active-card'));
+        card.classList.add('active-card');
+        const radio = card.querySelector('input[type="radio"]');
+        if (radio) radio.checked = true;
+      });
+    });
+
+    document.getElementById('btn-confirm-print-options')?.addEventListener('click', () => {
+      const selectedRadio = document.querySelector('input[name="print-diagram-orientation"]:checked');
+      const chosenOrientation = selectedRadio ? selectedRadio.value : 'landscape';
+      this.closeAllModals();
+      this.openPrintReportModal(chosenOrientation);
+    });
+
+    document.getElementById('btn-toggle-print-orientation')?.addEventListener('click', () => {
+      this.togglePrintOrientation();
+    });
+
+    window.addEventListener('beforeprint', () => {
+      this.renderPrintContent();
     });
 
     document.getElementById('btn-toggle-theme')?.addEventListener('click', () => {
@@ -149,6 +174,13 @@ class UBOApp {
 
     const previewLangBtn = document.getElementById('btn-toggle-lang-preview');
     if (previewLangBtn) previewLangBtn.setAttribute('title', t('lang_toggle_title'));
+
+    const orientationText = document.getElementById('current-orientation-text');
+    if (orientationText) {
+      orientationText.textContent = this.printOrientation === 'landscape'
+        ? t('print_btn_orientation_landscape')
+        : t('print_btn_orientation_portrait');
+    }
 
     // Update all elements with data-i18n
     document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -1034,10 +1066,51 @@ class UBOApp {
     setTimeout(() => this.canvas?.fitToView(), 150);
   }
 
-  openPrintReportModal() {
+  openPrintOptionsModal() {
+    const modal = document.getElementById('modal-print-options');
+    if (!modal) return;
+
+    // Check tree width to intelligently recommend landscape for wide trees
+    const layoutNodes = this.canvas?.layoutNodes;
+    if (layoutNodes && layoutNodes.size > 0) {
+      let minX = Infinity, maxX = -Infinity;
+      layoutNodes.forEach(item => {
+        minX = Math.min(minX, item.x);
+        maxX = Math.max(maxX, item.x + item.width);
+      });
+      const treeWidth = maxX - minX;
+      if (treeWidth > 850) {
+        this.printOrientation = 'landscape';
+      }
+    }
+
+    const landscapeRadio = document.querySelector('input[name="print-diagram-orientation"][value="landscape"]');
+    const portraitRadio = document.querySelector('input[name="print-diagram-orientation"][value="portrait"]');
+    const cardLandscape = document.getElementById('opt-card-landscape');
+    const cardPortrait = document.getElementById('opt-card-portrait');
+
+    if (this.printOrientation === 'portrait') {
+      if (portraitRadio) portraitRadio.checked = true;
+      cardPortrait?.classList.add('active-card');
+      cardLandscape?.classList.remove('active-card');
+    } else {
+      if (landscapeRadio) landscapeRadio.checked = true;
+      cardLandscape?.classList.add('active-card');
+      cardPortrait?.classList.remove('active-card');
+    }
+
+    modal.classList.add('modal-active');
+  }
+
+  openPrintReportModal(chosenOrientation) {
     const modal = document.getElementById('modal-print-report');
     if (!modal) return;
 
+    if (chosenOrientation) {
+      this.printOrientation = chosenOrientation;
+    }
+
+    this.applyPrintOrientationStyles();
     this.renderPrintContent();
 
     document.getElementById('btn-execute-print').onclick = () => {
@@ -1045,6 +1118,113 @@ class UBOApp {
     };
 
     modal.classList.add('modal-active');
+  }
+
+  togglePrintOrientation(forceOrientation) {
+    if (forceOrientation) {
+      this.printOrientation = forceOrientation;
+    } else {
+      this.printOrientation = this.printOrientation === 'landscape' ? 'portrait' : 'landscape';
+    }
+
+    this.applyPrintOrientationStyles();
+
+    // Dynamically update Sheet 1 in preview
+    const sheetDiagram = document.getElementById('print-sheet-diagram');
+    if (sheetDiagram) {
+      if (this.printOrientation === 'landscape') {
+        sheetDiagram.classList.remove('format-portrait');
+        sheetDiagram.classList.add('format-landscape');
+      } else {
+        sheetDiagram.classList.remove('format-landscape');
+        sheetDiagram.classList.add('format-portrait');
+      }
+    }
+  }
+
+  applyPrintOrientationStyles() {
+    // Update toolbar indicator
+    const orientationText = document.getElementById('current-orientation-text');
+    if (orientationText) {
+      orientationText.textContent = this.printOrientation === 'landscape'
+        ? t('print_btn_orientation_landscape')
+        : t('print_btn_orientation_portrait');
+    }
+
+    // Dynamic style tag for CSS @page to guarantee mixed printing:
+    // Page 1 is dynamically formatted as landscape or portrait based on user choice,
+    // and Page 2 is strictly formatted as portrait!
+    let styleEl = document.getElementById('dynamic-print-page-style');
+    if (!styleEl) {
+      styleEl = document.createElement('style');
+      styleEl.id = 'dynamic-print-page-style';
+      document.head.appendChild(styleEl);
+    }
+    styleEl.textContent = `
+      @page diagram-dynamic {
+        size: ${this.printOrientation};
+        margin: 8mm 10mm;
+      }
+      @page tables-portrait {
+        size: portrait;
+        margin: 10mm 12mm;
+      }
+      @media print {
+        .print-sheet-diagram {
+          page: diagram-dynamic !important;
+          break-after: page !important;
+          page-break-after: always !important;
+        }
+        .print-sheet-tables {
+          page: tables-portrait !important;
+          break-before: page !important;
+          page-break-before: always !important;
+        }
+      }
+    `;
+  }
+
+  getNodeEffectivePercentage(nodeId) {
+    if (!this.model || !this.model.nodes) return 0;
+    const { nodes, rootId } = this.model;
+    if (nodeId === rootId) return 100;
+    let curr = nodes[nodeId];
+    if (!curr) return 0;
+    let mult = 1.0;
+    const visited = new Set();
+    while (curr && curr.id !== rootId && !visited.has(curr.id)) {
+      visited.add(curr.id);
+      mult *= (Number(curr.directPercentage) || 0) / 100;
+      curr = curr.parentId ? nodes[curr.parentId] : null;
+    }
+    return mult * 100;
+  }
+
+  formatSvgTextLines(text, maxCharsPerLine = 23) {
+    if (!text) return [''];
+    if (text.length <= maxCharsPerLine) return [text];
+    const words = text.split(' ');
+    const lines = [];
+    let currentLine = '';
+
+    for (const word of words) {
+      if ((currentLine + ' ' + word).trim().length <= maxCharsPerLine) {
+        currentLine = (currentLine + ' ' + word).trim();
+      } else {
+        if (currentLine) lines.push(currentLine);
+        currentLine = word;
+      }
+      if (lines.length === 2) break;
+    }
+    if (currentLine && lines.length < 2) {
+      lines.push(currentLine);
+    }
+    if (lines.length === 2 && words.length > (lines[0].split(' ').length + lines[1].split(' ').length)) {
+      if (!lines[1].endsWith('...')) {
+        lines[1] = lines[1].slice(0, Math.max(0, maxCharsPerLine - 3)) + '...';
+      }
+    }
+    return lines;
   }
 
   renderPrintContent() {
@@ -1060,139 +1240,178 @@ class UBOApp {
 
     reportContainer.innerHTML = `
       <div class="print-document">
-        <!-- Report Header with AML Consultant Logo -->
-        <div class="print-header">
-          <div class="print-brand-row">
-            <div class="print-brand-left">
-              <div class="print-logo-container">
-                <img src="assets/aml_consultant_logo.png" alt="AML Consultant" class="print-logo-img" />
-              </div>
-              <div class="print-title-block">
-                <h1 class="print-doc-title">${t('print_doc_title')}</h1>
-                <div class="print-doc-subtitle">${t('print_doc_subtitle')}</div>
-                <div class="print-brand-ref">${t('print_brand_ref')}</div>
+        <!-- SHEET 1: RESUMEN Y DIAGRAMA (PÁGINA 1: ORIENTACIÓN CONFIGURABLE) -->
+        <div class="print-sheet print-sheet-diagram ${this.printOrientation === 'landscape' ? 'format-landscape' : 'format-portrait'}" id="print-sheet-diagram">
+          <!-- Report Header with AML Consultant Logo -->
+          <div class="print-header">
+            <div class="print-brand-row">
+              <div class="print-brand-left">
+                <div class="print-logo-container">
+                  <img src="assets/aml_consultant_logo.png" alt="AML Consultant" class="print-logo-img" />
+                </div>
+                <div class="print-title-block">
+                  <h1 class="print-doc-title">${t('print_doc_title')}</h1>
+                  <div class="print-doc-subtitle">${t('print_doc_subtitle')}</div>
+                  <div class="print-brand-ref">${t('print_brand_ref')}</div>
+                </div>
               </div>
             </div>
+            <div class="print-meta-grid">
+              <div><strong>${t('print_meta_company')}</strong> ${companyName}</div>
+              <div><strong>${t('print_meta_prepared')}</strong> ${preparedBy || t('not_specified')}</div>
+              <div><strong>${t('print_meta_date')}</strong> ${formattedDate}</div>
+              <div><strong>${t('print_meta_val_status')}</strong> ${summary.allLevelsValid ? t('print_val_valid') : t('print_val_invalid')}</div>
+            </div>
+            ${notes ? `<div class="print-notes-box"><strong>${t('print_notes_title')}</strong> ${notes}</div>` : ''}
           </div>
-          <div class="print-meta-grid">
-            <div><strong>${t('print_meta_company')}</strong> ${companyName}</div>
-            <div><strong>${t('print_meta_prepared')}</strong> ${preparedBy || t('not_specified')}</div>
-            <div><strong>${t('print_meta_date')}</strong> ${formattedDate}</div>
-            <div><strong>${t('print_meta_val_status')}</strong> ${summary.allLevelsValid ? t('print_val_valid') : t('print_val_invalid')}</div>
-          </div>
-          ${notes ? `<div class="print-notes-box"><strong>${t('print_notes_title')}</strong> ${notes}</div>` : ''}
-        </div>
 
-        <!-- Executive Summary Cards -->
-        <div class="print-summary-grid">
-          <div class="print-kpi-card">
-            <div class="kpi-label">${t('print_kpi_ind')}</div>
-            <div class="kpi-value kpi-individuals">${summary.attributedToIndividuals.toFixed(3).replace(/\.?0+$/, '')}%</div>
+          <!-- Executive Summary Cards -->
+          <div class="print-summary-grid">
+            <div class="print-kpi-card">
+              <div class="kpi-label">${t('print_kpi_ind')}</div>
+              <div class="kpi-value kpi-individuals">${summary.attributedToIndividuals.toFixed(3).replace(/\.?0+$/, '')}%</div>
+            </div>
+            <div class="print-kpi-card">
+              <div class="kpi-label">${t('print_kpi_special')}</div>
+              <div class="kpi-value kpi-special">${summary.stoppedInSpecialEntities.toFixed(3).replace(/\.?0+$/, '')}%</div>
+            </div>
+            <div class="print-kpi-card">
+              <div class="kpi-label">${t('print_kpi_pending')}</div>
+              <div class="kpi-value kpi-pending">${summary.pendingUnidentified.toFixed(3).replace(/\.?0+$/, '')}%</div>
+            </div>
+            <div class="print-kpi-card">
+              <div class="kpi-label">${t('print_kpi_total')}</div>
+              <div class="kpi-value kpi-total">${summary.totalExplained.toFixed(3).replace(/\.?0+$/, '')}%</div>
+            </div>
           </div>
-          <div class="print-kpi-card">
-            <div class="kpi-label">${t('print_kpi_special')}</div>
-            <div class="kpi-value kpi-special">${summary.stoppedInSpecialEntities.toFixed(3).replace(/\.?0+$/, '')}%</div>
-          </div>
-          <div class="print-kpi-card">
-            <div class="kpi-label">${t('print_kpi_pending')}</div>
-            <div class="kpi-value kpi-pending">${summary.pendingUnidentified.toFixed(3).replace(/\.?0+$/, '')}%</div>
-          </div>
-          <div class="print-kpi-card">
-            <div class="kpi-label">${t('print_kpi_total')}</div>
-            <div class="kpi-value kpi-total">${summary.totalExplained.toFixed(3).replace(/\.?0+$/, '')}%</div>
-          </div>
-        </div>
 
-        <!-- Visual Legend -->
-        <div class="print-legend">
-          <span class="legend-title">${t('print_legend_title')}</span>
-          <span class="legend-item"><span class="legend-color legend-root"></span> ${t('print_legend_root')}</span>
-          <span class="legend-item"><span class="legend-color legend-business"></span> ${t('print_legend_business')}</span>
-          <span class="legend-item"><span class="legend-color legend-person"></span> ${t('print_legend_person')}</span>
-          <span class="legend-item"><span class="legend-color legend-special"></span> ${t('print_legend_special')}</span>
-        </div>
-
-        <!-- Visual Ownership Tree Diagram (Vector snapshot) -->
-        <div class="print-section">
-          <h2 class="print-section-title">${t('print_section1_title')}</h2>
-          <div class="print-tree-container">
-            ${this.generatePrintTreeSVG()}
+          <!-- Visual Legend -->
+          <div class="print-legend">
+            <span class="legend-title">${t('print_legend_title')}</span>
+            <span class="legend-item"><span class="legend-color legend-root"></span> <strong>${t('print_legend_root')}</strong></span>
+            <span class="legend-item"><span class="legend-color legend-business"></span> <strong>${t('print_legend_business')}</strong></span>
+            <span class="legend-item"><span class="legend-color legend-person"></span> <strong>${t('print_legend_person')}</strong></span>
+            <span class="legend-item"><span class="legend-color legend-special"></span> <strong>${t('print_legend_special')}</strong></span>
           </div>
-        </div>
 
-        <!-- Consolidated Individuals Table -->
-        <div class="print-section print-page-break">
-          <h2 class="print-section-title">${t('print_section2_title')}</h2>
-          <p class="print-section-desc">${t('print_section2_desc')}</p>
-          
-          <table class="print-table">
-            <thead>
-              <tr>
-                <th style="width: 50px;">${t('print_th_rank')}</th>
-                <th>${t('print_th_name')}</th>
-                <th style="width: 140px;">${t('print_th_routes')}</th>
-                <th style="width: 160px; text-align: right;">${t('print_th_effective_pct')} ${companyName}</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${individuals.length === 0 ? `
-                <tr><td colspan="4" style="text-align: center; color: #888;">${t('print_no_individuals')}</td></tr>
-              ` : individuals.map((ind, i) => `
-                <tr class="print-row-main">
-                  <td><strong>${i + 1}</strong></td>
-                  <td>
-                    <strong>${ind.name}</strong>
-                    <div class="print-routes-sub">
-                      ${ind.routes.map((r, rIdx) => `
-                        <div class="print-route-line">
-                          <span>${t('route_num')} ${rIdx + 1}: ${r.pathString}</span>
-                          <span class="print-formula-pill">(${r.path.filter(p => p.type !== 'root').map(p => `${p.directPercentage}%`).join(' × ')} = ${r.effectivePercentage.toFixed(3).replace(/\.?0+$/, '')}%)</span>
-                        </div>
-                      `).join('')}
-                    </div>
-                  </td>
-                  <td>${ind.routes.length} ${t('results_routes')}</td>
-                  <td style="text-align: right; font-weight: bold; font-size: 15px; color: #15803d;">
-                    ${ind.effectivePercentage.toFixed(3).replace(/\.?0+$/, '')}%
-                  </td>
-                </tr>
-              `).join('')}
-            </tbody>
-          </table>
-        </div>
-
-        <!-- Special Entities Table -->
-        ${specialEntities.length > 0 ? `
+          <!-- Visual Ownership Tree Diagram (Vector snapshot with strong bold high-contrast text) -->
           <div class="print-section">
-            <h2 class="print-section-title">${t('print_section3_title')}</h2>
-            <p class="print-section-desc">${t('print_section3_desc')}</p>
+            <h2 class="print-section-title">${t('print_section1_title')}</h2>
+            <div class="print-tree-container">
+              ${this.generatePrintTreeSVG()}
+            </div>
+          </div>
+
+          <!-- Sheet 1 Footer Indicator -->
+          <div class="print-sheet-footer">
+            <span>${t('print_page1_footer_label')}</span>
+            <span>${companyName} • AML Consultant</span>
+          </div>
+        </div>
+
+        <!-- VISUAL PAGE BREAK SEPARATOR FOR SCREEN PREVIEW -->
+        <div class="print-preview-page-divider">
+          <div class="divider-line"></div>
+          <div class="divider-badge">
+            <span>📄 ${t('print_page2_badge')}</span>
+          </div>
+          <div class="divider-line"></div>
+        </div>
+
+        <!-- SHEET 2: LISTA CONSOLIDADA DE BENEFICIARIOS Y ENTIDADES (PÁGINA 2 - ALWAYS PORTRAIT) -->
+        <div class="print-sheet print-sheet-tables format-portrait" id="print-sheet-tables">
+          <!-- Sheet 2 Mini Header -->
+          <div class="print-sheet2-header">
+            <div class="sheet2-brand">
+              <img src="assets/aml_consultant_logo.png" alt="AML Consultant" class="sheet2-logo" />
+              <div>
+                <div class="sheet2-title">${t('print_doc_title')}</div>
+                <div class="sheet2-subtitle">${companyName} • ${t('print_section2_title')}</div>
+              </div>
+            </div>
+            <div class="sheet2-badge-portrait">${t('print_sheet2_portrait_indicator')}</div>
+          </div>
+
+          <!-- Consolidated Individuals Table -->
+          <div class="print-section">
+            <h2 class="print-section-title">${t('print_section2_title')}</h2>
+            <p class="print-section-desc">${t('print_section2_desc')}</p>
+            
             <table class="print-table">
               <thead>
                 <tr>
-                  <th>${t('print_th_sp_name')}</th>
-                  <th>${t('print_th_sp_category')}</th>
-                  <th>${t('print_th_sp_route')}</th>
-                  <th style="width: 140px; text-align: right;">${t('print_th_sp_pct')}</th>
+                  <th style="width: 50px;">${t('print_th_rank')}</th>
+                  <th>${t('print_th_name')}</th>
+                  <th style="width: 140px;">${t('print_th_routes')}</th>
+                  <th style="width: 170px; text-align: right;">${t('print_th_effective_pct')} ${companyName}</th>
                 </tr>
               </thead>
               <tbody>
-                ${specialEntities.map(sp => `
-                  <tr>
-                    <td><strong>${sp.name}</strong></td>
-                    <td><span class="print-cat-badge">🛡️ ${getCategoryLabel(sp.category) || sp.categoryLabel}</span></td>
-                    <td class="print-route-text">${sp.pathString}</td>
-                    <td style="text-align: right; font-weight: bold; color: #b45309;">${sp.effectivePercentage.toFixed(3).replace(/\.?0+$/, '')}%</td>
+                ${individuals.length === 0 ? `
+                  <tr><td colspan="4" style="text-align: center; color: #888;">${t('print_no_individuals')}</td></tr>
+                ` : individuals.map((ind, i) => `
+                  <tr class="print-row-main">
+                    <td><strong>${i + 1}</strong></td>
+                    <td>
+                      <strong style="font-size: 13px; color: #000000;">${ind.name}</strong>
+                      <div class="print-routes-sub">
+                        ${ind.routes.map((r, rIdx) => `
+                          <div class="print-route-line">
+                            <span><strong>${t('route_num')} ${rIdx + 1}:</strong> ${r.pathString}</span>
+                            <span class="print-formula-pill">(${r.path.filter(p => p.type !== 'root').map(p => `${p.directPercentage}%`).join(' × ')} = ${r.effectivePercentage.toFixed(3).replace(/\.?0+$/, '')}%)</span>
+                          </div>
+                        `).join('')}
+                      </div>
+                    </td>
+                    <td><strong>${ind.routes.length}</strong> ${t('results_routes')}</td>
+                    <td style="text-align: right; font-weight: 900; font-size: 16px; color: #15803d;">
+                      ${ind.effectivePercentage.toFixed(3).replace(/\.?0+$/, '')}%
+                    </td>
                   </tr>
                 `).join('')}
               </tbody>
             </table>
           </div>
-        ` : ''}
 
-        <!-- Disclaimer Footer -->
-        <div class="print-disclaimer">
-          <strong>${t('print_disclaimer_title')}</strong>
-          ${t('print_disclaimer_text')}
+          <!-- Special Entities Table -->
+          ${specialEntities.length > 0 ? `
+            <div class="print-section">
+              <h2 class="print-section-title">${t('print_section3_title')}</h2>
+              <p class="print-section-desc">${t('print_section3_desc')}</p>
+              <table class="print-table">
+                <thead>
+                  <tr>
+                    <th>${t('print_th_sp_name')}</th>
+                    <th>${t('print_th_sp_category')}</th>
+                    <th>${t('print_th_sp_route')}</th>
+                    <th style="width: 140px; text-align: right;">${t('print_th_sp_pct')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${specialEntities.map(sp => `
+                    <tr>
+                      <td><strong style="color: #000000;">${sp.name}</strong></td>
+                      <td><span class="print-cat-badge">🛡️ ${getCategoryLabel(sp.category) || sp.categoryLabel}</span></td>
+                      <td class="print-route-text">${sp.pathString}</td>
+                      <td style="text-align: right; font-weight: 900; font-size: 15px; color: #b45309;">${sp.effectivePercentage.toFixed(3).replace(/\.?0+$/, '')}%</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          ` : ''}
+
+          <!-- Disclaimer Footer -->
+          <div class="print-disclaimer">
+            <strong>${t('print_disclaimer_title')}</strong>
+            ${t('print_disclaimer_text')}
+          </div>
+
+          <!-- Sheet 2 Footer Indicator -->
+          <div class="print-sheet-footer">
+            <span>${t('print_page2_footer_label')}</span>
+            <span>${formattedDate}</span>
+          </div>
         </div>
       </div>
     `;
@@ -1200,6 +1419,7 @@ class UBOApp {
 
   /**
    * Generates a clean, scaled, self-contained SVG for the printable report
+   * Designed with strong typography, thick lines, and solid borders for crisp printing.
    */
   generatePrintTreeSVG() {
     if (!this.canvas || !this.canvas.layoutNodes || this.canvas.layoutNodes.size === 0) {
@@ -1217,7 +1437,7 @@ class UBOApp {
       maxY = Math.max(maxY, item.y + item.height);
     });
 
-    const pad = 40;
+    const pad = 36;
     const width = maxX - minX + pad * 2;
     const height = maxY - minY + pad * 2;
     const offsetX = pad - minX;
@@ -1227,7 +1447,7 @@ class UBOApp {
     const lines = [];
     const nodeBoxes = [];
 
-    // Connectors
+    // Connectors with thick dark lines and bold percentages
     Object.values(nodes).forEach(node => {
       if (!node.parentId || !layoutNodes.has(node.id) || !layoutNodes.has(node.parentId)) return;
 
@@ -1242,15 +1462,15 @@ class UBOApp {
 
       const pathD = `M ${x1} ${y1} C ${x1} ${midY}, ${x2} ${midY}, ${x2} ${y2}`;
       lines.push(`
-        <path d="${pathD}" fill="none" stroke="#94a3b8" stroke-width="2" />
+        <path d="${pathD}" fill="none" stroke="#1e293b" stroke-width="2.6" stroke-linecap="round" />
         <g transform="translate(${(x1 + x2) / 2}, ${midY})">
-          <rect x="-32" y="-11" width="64" height="22" rx="11" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.2"/>
-          <text x="0" y="4" text-anchor="middle" font-size="10.5" font-weight="bold" fill="#334155">${node.directPercentage}%</text>
+          <rect x="-36" y="-13" width="72" height="26" rx="13" fill="#ffffff" stroke="#1e293b" stroke-width="2.2"/>
+          <text x="0" y="5" text-anchor="middle" font-size="12" font-weight="900" fill="#000000">${Number(node.directPercentage).toFixed(2).replace(/\.00$/, '')}%</text>
         </g>
       `);
     });
 
-    // Nodes
+    // Nodes with strong bold labels, solid borders, and full contrast
     Object.values(nodes).forEach(node => {
       const l = layoutNodes.get(node.id);
       if (!l) return;
@@ -1258,54 +1478,107 @@ class UBOApp {
       const x = l.x + offsetX;
       const y = l.y + offsetY;
 
-      let strokeColor = '#bae6fd';
-      let headerBg = '#f0f9ff';
+      let strokeColor = '#0284c7'; // solid ocean blue
+      let headerBg = '#e0f2fe';
       let titleColor = '#0369a1';
-      let typeLabel = t('node_badge_business');
+      let typeLabel = `🏛️ ${t('node_badge_business')}`;
 
       if (node.isRoot) {
-        strokeColor = '#c7d2fe';
-        headerBg = '#eef2ff';
-        titleColor = '#4338ca';
-        typeLabel = t('node_badge_root');
+        strokeColor = '#4338ca'; // solid deep indigo
+        headerBg = '#e0e7ff';
+        titleColor = '#312e81';
+        typeLabel = `🏢 ${t('node_badge_root')}`;
       } else if (node.specialCategory) {
-        strokeColor = '#fde68a';
-        headerBg = '#fffbeb';
-        titleColor = '#b45309';
-        typeLabel = t('node_badge_special');
+        strokeColor = '#d97706'; // solid amber
+        headerBg = '#fef3c7';
+        titleColor = '#92400e';
+        typeLabel = `🛡️ ${t('node_badge_special')}`;
       } else if (node.type === 'person') {
-        strokeColor = '#bbf7d0';
-        headerBg = '#f0fdf4';
-        titleColor = '#15803d';
-        typeLabel = t('node_badge_person');
+        strokeColor = '#16a34a'; // solid emerald green
+        headerBg = '#dcfce7';
+        titleColor = '#14532d';
+        typeLabel = `👤 ${t('node_badge_person')}`;
+      }
+
+      // Format name across 1 or 2 lines
+      const nameLines = this.formatSvgTextLines(node.name, 23);
+      let nameSvg = '';
+      let directY = 74;
+      let effY = 95;
+      let subY = 117;
+
+      if (nameLines.length === 1) {
+        nameSvg = `<text x="14" y="51" font-size="13.5" font-weight="900" fill="#000000">${this.escapeXml(nameLines[0])}</text>`;
+        directY = 74;
+        effY = 95;
+        subY = 117;
+      } else {
+        nameSvg = `
+          <text x="14" y="44" font-size="12.5" font-weight="900" fill="#000000">
+            <tspan x="14" dy="0">${this.escapeXml(nameLines[0])}</tspan>
+            <tspan x="14" dy="15">${this.escapeXml(nameLines[1])}</tspan>
+          </text>
+        `;
+        directY = 80;
+        effY = 99;
+        subY = 119;
+      }
+
+      // Compute effective % for this node in target company
+      const effPct = this.getNodeEffectivePercentage(node.id);
+
+      // Direct % display
+      const directPctText = node.isRoot
+        ? `<text x="14" y="${directY}" font-size="12.5" font-weight="800" fill="#0f172a">${t('node_root_share')}: <tspan font-weight="900" fill="#000000">100%</tspan></text>`
+        : `<text x="14" y="${directY}" font-size="12" font-weight="800" fill="#0f172a">${t('node_direct_share')} <tspan font-weight="900" fill="#000000">${Number(node.directPercentage).toFixed(2).replace(/\.00$/, '')}%</tspan></text>`;
+
+      // Effective % display
+      const effectiveText = !node.isRoot
+        ? `<text x="14" y="${effY}" font-size="11.5" font-weight="800" fill="#15803d">${t('node_effective_root')} <tspan font-weight="900" fill="#15803d">${effPct.toFixed(3).replace(/\.?0+$/, '')}%</tspan></text>`
+        : '';
+
+      // Bottom Subtitle / Tag
+      let subBadgeText = '';
+      if (node.specialCategory) {
+        const catLabel = getCategoryLabel(node.specialCategory) || node.specialCategory;
+        subBadgeText = `<text x="14" y="${subY}" font-size="10.5" font-weight="800" fill="#92400e">🛡️ ${this.escapeXml(catLabel)} (${t('node_stopped_branch')})</text>`;
+      } else if (node.type === 'person') {
+        const personId = node.personId || node.id;
+        const linkedCount = Object.values(nodes).filter(n => n.type === 'person' && (n.personId || n.id) === personId).length;
+        const linkedText = linkedCount > 1 ? ` • 🔗 ${t('node_linked_tag')}` : '';
+        subBadgeText = `<text x="14" y="${subY}" font-size="10.5" font-weight="800" fill="#15803d">👤 ${t('node_badge_person')}${linkedText}</text>`;
+      } else if (!node.isRoot) {
+        subBadgeText = `<text x="14" y="${subY}" font-size="10.5" font-weight="800" fill="#0369a1">🏛️ ${t('node_badge_business')}</text>`;
       }
 
       nodeBoxes.push(`
         <g transform="translate(${x}, ${y})">
-          <!-- Card Body -->
-          <rect x="0" y="0" width="${l.width}" height="${l.height}" rx="8" fill="#ffffff" stroke="${strokeColor}" stroke-width="1.8" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.04))"/>
+          <!-- Card Body with Solid High-Contrast Border -->
+          <rect x="0" y="0" width="${l.width}" height="${l.height}" rx="8" fill="#ffffff" stroke="${strokeColor}" stroke-width="2.4" />
+          
           <!-- Card Header Bar -->
-          <path d="M 0 8 Q 0 0 8 0 L ${l.width - 8} 0 Q ${l.width} 0 ${l.width} 8 L ${l.width} 26 L 0 26 Z" fill="${headerBg}" />
-          <text x="12" y="18" font-size="10.5" font-weight="bold" fill="${titleColor}">${typeLabel}</text>
-          <!-- Node Name -->
-          <text x="14" y="50" font-size="12.5" font-weight="bold" fill="#0f172a">${this.escapeXml(node.name)}</text>
-          <!-- Direct % or details -->
-          <text x="14" y="72" font-size="10.5" fill="#475569">
-            ${node.isRoot ? t('node_root_share') : `${t('node_direct_share')} ${node.directPercentage}%`}
-          </text>
-          ${node.specialCategory ? `
-            <text x="14" y="92" font-size="9.5" font-weight="bold" fill="#b45309">🛡️ ${t('node_stopped_branch')}</text>
-          ` : ''}
-          ${node.type === 'person' ? `
-            <text x="14" y="92" font-size="9.5" fill="#15803d">👤 ${t('node_badge_person')}</text>
-          ` : ''}
+          <path d="M 0 8 Q 0 0 8 0 L ${l.width - 8} 0 Q ${l.width} 0 ${l.width} 8 L ${l.width} 28 L 0 28 Z" fill="${headerBg}" />
+          <line x1="0" y1="28" x2="${l.width}" y2="28" stroke="${strokeColor}" stroke-width="1.8" />
+          <text x="12" y="19" font-size="11.5" font-weight="800" fill="${titleColor}">${typeLabel}</text>
+          
+          <!-- Node Name (BOLD / STRONG BLACK) -->
+          ${nameSvg}
+          
+          <!-- Direct Percentage (BOLD / STRONG) -->
+          ${directPctText}
+          
+          <!-- Effective Percentage in Target (BOLD / STRONG GREEN) -->
+          ${effectiveText}
+          
+          <!-- Category / Type Info (BOLD / STRONG) -->
+          ${subBadgeText}
         </g>
       `);
     });
 
     return `
-      <svg viewBox="0 0 ${width} ${height}" style="width: 100%; max-height: 520px; font-family: system-ui, -apple-system, sans-serif;">
-        <rect width="100%" height="100%" fill="#fafafa"/>
+      <svg viewBox="0 0 ${width} ${height}" class="print-tree-svg" style="width: 100%; height: auto; font-family: system-ui, -apple-system, sans-serif;">
+        <rect width="100%" height="100%" fill="#ffffff"/>
         <g>${lines.join('')}</g>
         <g>${nodeBoxes.join('')}</g>
       </svg>
